@@ -1,0 +1,28 @@
+{
+  "name": "monitoring-service",
+  "version": "1.0.0",
+  "description": "infinitely schedule changes monitoring",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon ./index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RyabovNick/Monitoring-service.git"
+  },
+  "author": "Ryabov Nick",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/RyabovNick/Monitoring-service/issues"
+  },
+  "homepage": "https://github.com/RyabovNick/Monitoring-service#readme",
+  "dependencies": {
+    "axios": "^0.18.0",
+    "dotenv": "^8.0.0",
+    "fs-extra": "^8.0.1",
+    "moment": "^2.24.0",
+    "mssql": "^5.1.0",
+    "winston": "^3.2.1"
+  }
+}

@@ -1,0 +1,73 @@
+kind: pipeline
+name: default
+
+steps:
+  - name: test
+    image: node:10-alpine
+    commands:
+      - npm install
+      # - npm run test
+    when:
+    branch:
+      - master
+    event:
+      - push
+      - pull-request
+
+  - name: deploy
+    image: docker
+    volumes:
+      - name: docker
+        path: /var/run/docker.sock
+    environment:
+      NODE_ENV:
+        from_secret: NODE_ENV
+      DB_USER:
+        from_secret: DB_USER
+      DB_PASS:
+        from_secret: DB_PASS
+      DB_SERVER:
+        from_secret: DB_SERVER
+      DB_DATABASE:
+        from_secret: DB_DATABASE
+      DB_DATABASE_PROF:
+        from_secret: DB_DATABASE_PROF
+      PORT: 3000
+    settings:
+      build_args_from_env:
+      - NODE_ENV
+      - DB_USER
+      - DB_PASS
+      - DB_SERVER
+      - DB_DATABASE
+      - DB_DATABASE_PROF
+    commands:
+      - docker build -t nick/monitoring_service .
+      - docker rmi -f $(docker images -f "dangling=true" -q) || true
+      - docker container stop monitoring_service || true && docker rm monitoring_service || true
+      - docker run -v /home/monitoring_service_logs:/home/node/monitoring_service/logs -e NODE_ENV=$NODE_ENV -e DB_USER=$DB_USER -e DB_PASS=$DB_PASS -e DB_SERVER=$DB_SERVER -e DB_DATABASE=$DB_DATABASE -e DB_DATABASE_PROF=$DB_DATABASE_PROF -p 8477:3000 -d --name=monitoring_service nick/monitoring_service
+
+  - name: telegram
+    image: appleboy/drone-telegram:latest
+    settings:
+      token:
+        from_secret: telegram_token
+      to:
+        from_secret: telegram_user_id
+      message: >
+      format: html
+      message: >
+        {{#success build.status}}
+          <code>{{repo.owner}}/{{repo.name}}</code> <a href="{{build.link}}">SUCCESS</a> 
+          <code>{{commit.branch}}</code>@<a href="{{commit.link}}">{{truncate commit.sha 7}}</a>
+        {{else}}
+          <code>{{repo.owner}}/{{repo.name}}</code> <a href="{{build.link}}">FAILURE</a>
+          <code>{{commit.branch}}</code>@<a href="{{commit.link}}">{{truncate commit.sha 7}}</a>
+        {{/success}}
+    when:
+      status: [success, failure]
+
+volumes:
+  - name: docker
+    host:
+      path: /var/run/docker.sock
