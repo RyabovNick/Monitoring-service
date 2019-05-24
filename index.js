@@ -88,7 +88,7 @@ setInterval(function() {
 
           axios
             .get(`${process.env.PUSH_SERVICE}test`, {
-              proxy: { host: '127.0.0.1', port: 8846 },
+              proxy: { host: '127.0.0.1', port: 8446 },
             })
             .then(res => {
               logger.log('success', 'Get3', { res });
