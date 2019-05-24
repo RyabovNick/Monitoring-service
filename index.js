@@ -69,6 +69,35 @@ setInterval(function() {
           } = result.recordset[0]; // сделать в цикле
 
           axios
+            .get(`${process.env.PUSH_SERVICE}test`)
+            .then(res => {
+              logger.log('success', 'Get1', { res });
+            })
+            .catch(err1 => {
+              logger.log('error', 'Get1', { err1 });
+            });
+
+          axios
+            .get(`${process.env.PUSH_SERVICE}test`, { proxy: false })
+            .then(res => {
+              logger.log('success', 'Get2', { res });
+            })
+            .catch(err1 => {
+              logger.log('error', 'Get2', { err1 });
+            });
+
+          axios
+            .get(`${process.env.PUSH_SERVICE}test`, {
+              proxy: { host: '127.0.0.1', port: 8846 },
+            })
+            .then(res => {
+              logger.log('success', 'Get3', { res });
+            })
+            .catch(err1 => {
+              logger.log('error', 'Get3', { err1 });
+            });
+
+          axios
             .post(`${process.env.PUSH_SERVICE}push`, {
               title: 'Изменение в расписании',
               content: `${day} ${lesson} ${cabinet} ${teacher_short} ${discipline_short}`,
