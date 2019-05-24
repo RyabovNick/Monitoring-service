@@ -68,21 +68,34 @@ setInterval(function() {
             group,
           } = result.recordset[0]; // сделать в цикле
 
-          axios({
-            method: 'post',
-            url: `${process.env.PUSH_SERVICE}push`,
-            data: {
+          axios
+            .post(`${process.env.PUSH_SERVICE}push`, {
               title: 'Изменение в расписании',
               content: `${day} ${lesson} ${cabinet} ${teacher_short} ${discipline_short}`,
               topic: 'all',
-            },
-          })
+            })
             .then(res => {
               logger.log('success', 'Push successfully send', { res });
             })
             .catch(err1 => {
               logger.log('error', 'Push request error', { err1 });
             });
+
+          // axios({
+          //   method: 'post',
+          //   url: `${process.env.PUSH_SERVICE}push`,
+          //   data: {
+          //     title: 'Изменение в расписании',
+          //     content: `${day} ${lesson} ${cabinet} ${teacher_short} ${discipline_short}`,
+          //     topic: 'all',
+          //   },
+          // })
+          //   .then(res => {
+          //     logger.log('success', 'Push successfully send', { res });
+          //   })
+          //   .catch(err1 => {
+          //     logger.log('error', 'Push request error', { err1 });
+          //   });
         }
 
         pool.close();
