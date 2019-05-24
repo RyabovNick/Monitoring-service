@@ -1,3 +1,5 @@
+// чтобы не орал на сертификат
+process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
 require('dotenv').config();
 const sql = require('mssql');
 const moment = require('moment');
@@ -10,7 +12,7 @@ const interval = 0.3 * 60 * 1000;
 // при старте отправляем сообщения, добавленные
 // за последние 10 минут
 let date_from = moment()
-  .subtract(10, 'minutes')
+  .subtract(280, 'minutes')
   .add(3, 'hours')
   .toISOString();
 
@@ -56,7 +58,6 @@ setInterval(function() {
           .subtract(25, 'ms') // страховка на случай небольшой задержки передачи
           .add(3, 'hours')
           .toISOString();
-        console.log('result.recordset: ', result.recordset);
 
         if (result.recordset.length !== 0) {
           const {
@@ -68,63 +69,21 @@ setInterval(function() {
             group,
           } = result.recordset[0]; // сделать в цикле
 
-          axios
-            .get(`${process.env.PUSH_SERVICE}test`)
-            .then(res => {
-              logger.log('success', 'Get1', { res });
-            })
-            .catch(err1 => {
-              logger.log('error', 'Get1', { err1 });
-            });
-
-          axios
-            .get(`${process.env.PUSH_SERVICE}test`, { proxy: false })
-            .then(res => {
-              logger.log('success', 'Get2', { res });
-            })
-            .catch(err1 => {
-              logger.log('error', 'Get2', { err1 });
-            });
-
-          axios
-            .get(`${process.env.PUSH_SERVICE}test`, {
-              proxy: { host: '127.0.0.1', port: 8446 },
-            })
-            .then(res => {
-              logger.log('success', 'Get3', { res });
-            })
-            .catch(err1 => {
-              logger.log('error', 'Get3', { err1 });
-            });
-
-          axios
-            .post(`${process.env.PUSH_SERVICE}push`, {
+          axios({
+            method: 'post',
+            url: `${process.env.PUSH_SERVICE}push`,
+            data: {
               title: 'Изменение в расписании',
               content: `${day} ${lesson} ${cabinet} ${teacher_short} ${discipline_short}`,
               topic: 'all',
-            })
+            },
+          })
             .then(res => {
-              logger.log('success', 'Push successfully send', { res });
+              logger.log('info', 'Push successfully send', { res });
             })
             .catch(err1 => {
               logger.log('error', 'Push request error', { err1 });
             });
-
-          // axios({
-          //   method: 'post',
-          //   url: `${process.env.PUSH_SERVICE}push`,
-          //   data: {
-          //     title: 'Изменение в расписании',
-          //     content: `${day} ${lesson} ${cabinet} ${teacher_short} ${discipline_short}`,
-          //     topic: 'all',
-          //   },
-          // })
-          //   .then(res => {
-          //     logger.log('success', 'Push successfully send', { res });
-          //   })
-          //   .catch(err1 => {
-          //     logger.log('error', 'Push request error', { err1 });
-          //   });
         }
 
         pool.close();
