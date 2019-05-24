@@ -56,6 +56,7 @@ setInterval(function() {
           .subtract(25, 'ms') // страховка на случай небольшой задержки передачи
           .add(3, 'hours')
           .toISOString();
+        console.log('result.recordset: ', result.recordset);
 
         if (result.recordset.length !== 0) {
           const {
@@ -65,7 +66,7 @@ setInterval(function() {
             teacher_short,
             discipline_short,
             group,
-          } = result.recordset;
+          } = result.recordset[0]; // сделать в цикле
 
           axios({
             method: 'post',
