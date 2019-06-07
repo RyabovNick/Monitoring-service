@@ -26,7 +26,7 @@ setInterval(function() {
     // надо всё, только проверять что произошло
     request.query(
       `
-      SELECT TOP (1000) 
+      SELECT TOP (10) 
         _Document30_IDRRef as link
         ,[time].[tran_begin_time] as time_start
         ,[time].[tran_end_time] as time_finish
@@ -49,6 +49,7 @@ setInterval(function() {
         INNER JOIN [UniASR].[dbo].[Справочник_Группы] as gr on zan_gr.Группа_Ссылка = gr.Ссылка
         INNER JOIN [UniASR].[dbo].[Справочник_ВременныеОкна] as par on main.[_Fld208RRef] = par.Ссылка
       WHERE [time].[tran_end_time] > @date_start and [__$operation] = 2 -- только insert
+      ORDER BY time_finish desc
       `,
       (error, result) => {
         if (error) logger.log('error', 'Request error', { error });
@@ -68,6 +69,7 @@ setInterval(function() {
             discipline_short,
             group,
           } = result.recordset[0]; // сделать в цикле
+          console.log('result.recordset[0]: ', result.recordset[0]);
 
           axios({
             method: 'post',
