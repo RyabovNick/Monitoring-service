@@ -70,6 +70,26 @@ steps:
     when:
       status: [success, failure]
 
+  - name: telegram1
+    image: appleboy/drone-telegram:latest
+    settings:
+      token:
+        from_secret: telegram_token
+      to:
+        from_secret: telegram_user_id_1
+      message: >
+      format: html
+      message: >
+        {{#success build.status}}
+          <code>{{repo.owner}}/{{repo.name}}</code> <a href="{{build.link}}">SUCCESS</a> 
+          <code>{{commit.branch}}</code>@<a href="{{commit.link}}">{{truncate commit.sha 7}}</a>
+        {{else}}
+          <code>{{repo.owner}}/{{repo.name}}</code> <a href="{{build.link}}">FAILURE</a>
+          <code>{{commit.branch}}</code>@<a href="{{commit.link}}">{{truncate commit.sha 7}}</a>
+        {{/success}}
+    when:
+      status: [success, failure]
+
 volumes:
   - name: docker
     host:

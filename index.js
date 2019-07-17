@@ -1,5 +1,3 @@
-// чтобы не орал на сертификат
-process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
 require('dotenv').config();
 const sql = require('mssql');
 const moment = require('moment');
